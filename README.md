@@ -131,25 +131,8 @@ Silnikiem uczenia maszynowego jest PyCaret (moduły classification i regression)
 
 ## 6. Uruchomienie
 
-### 6.1. Adres Streamlit
-
 ```
 https://lyraapp.streamlit.app/
-```
-
-### 6.2. Uruchomienie lokalnie
-
-#### 6.2.1. Instalacja środowiska
-
-```
-conda env create -f environment.yml
-conda activate LYRA
-```
-
-#### 6.2.2. Uruchomienie aplikacji
-
-```
-streamlit run app.py
 ```
 
 ## 7. Przykładowy workflow użytkownika
