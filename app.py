@@ -241,15 +241,12 @@ with tab_0:
                 if problem == "classification":
                     clf_setup(df, target=target, session_id=42, fold=3)
                     best_model = clf_compare(
-                        include=["rf", "et", "gbc", "lightgbm", "ada", "dt",
-                                 "lr", "ridge", "lda", "svm"]
+                        include=["rf", "lightgbm", "lr"]
                     )
                 else:
                     reg_setup(df, target=target, session_id=42, fold=3 )
                     best_model = reg_compare(
-                        include=["rf", "et", "gbr", "lightgbm", "ada", "dt",
-                                 "lr", "lasso", "ridge", "en", "lar",
-                                 "llar", "br", "omp", "par"]
+                        include=["rf", "lightgbm", "lr"]
                     )
 
                 if isinstance(best_model, list):

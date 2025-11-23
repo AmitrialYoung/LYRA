@@ -59,13 +59,18 @@ System wykrywa i obsługuje:
 
 Aplikacja wykorzystuje funkcję `compare_models()` z PyCaret, bazując na specjalnie wybranych listach modeli.
 
+Streamlit nie powala na dłuższe i bardziej skąplikowane obliczenia więc liczba modeli została ograniczona do 3.
+
+Domyślnie PyCaret trenuje każdy model 10 razy (10-fold cross validation)
+Zmiejszono cross validation do 3. `setup(..., fold=3)`
+
 #### Modele klasyfikacyjne:
 
-rf, et, gbc, lightgbm, ada, dt, lr, ridge, lda, svm
+rf, lightgbm, lr
 
 #### Modele regresyjne:
 
-rf, et, gbr, lightgbm, ada, dt, lr, lasso, ridge, en, lar, llar, br, omp, par
+rf, lightgbm, lr
 
 #### Powód wyboru tych modeli:
 
@@ -129,7 +134,7 @@ Silnikiem uczenia maszynowego jest PyCaret (moduły classification i regression)
 ### 6.1. Adres Streamlit
 
 ```
-www adres
+https://lyraapp.streamlit.app/
 ```
 
 ### 6.2. Uruchomienie lokalnie
