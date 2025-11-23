@@ -112,30 +112,13 @@ System wyświetla komunikaty:
 - informacyjne,
 - potwierdzające wykonanie kroków.
 
-## 4. Architektura i logika działania
-
-- **tab_0** – logika wczytywania danych, wyboru targetu, modelowania oraz prezentacji wyników.
-- **tab_1** – pełny podgląd danych.
-
-Silnikiem uczenia maszynowego jest PyCaret (moduły classification i regression).
-
-## 5. Wymagania
-
-- Python 3.11  
-- Streamlit  
-- PyCaret  
-- scikit-learn  
-- Pandas, NumPy  
-- PIL  
-- openpyxl
-
-## 6. Uruchomienie
+## 4. Uruchomienie
 
 ```
 https://lyraapp.streamlit.app/
 ```
 
-## 7. Przykładowy workflow użytkownika
+## 5. Przykładowy workflow użytkownika
 
 1. Wybór źródła danych.  
 2. Wczytanie i podgląd danych.  
@@ -144,7 +127,7 @@ https://lyraapp.streamlit.app/
 5. Uruchomienie analizy cech.  
 6. Prezentacja modelu + wykresu + opisu + najważniejszej cechy.
 
-## 8. Plan rozwoju
+## 6. Plan rozwoju
 
 - SHAP values,
 - automatyczny wybór kolumny docelowej,
