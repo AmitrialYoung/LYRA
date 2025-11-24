@@ -57,6 +57,7 @@ st.session_state.setdefault("source", None)
 st.session_state.setdefault("selected_file", None)
 st.session_state.setdefault("best_model", None)
 st.session_state.setdefault("target_column", None)
+st.session_state.setdefault("df_clean", None)
 
 # Katalog na wykresy
 PLOT_DIR = Path("plots_feature")
@@ -76,9 +77,10 @@ with tab_0:
     wybor = st.radio(
         "📦 Wybierz źródło danych:",
         ["Wybierz plik z danymi", "DataFrame z PyCaret", "Wczytaj własne dane"],
-        index=0 if st.session_state["source"] is None else
-        ["Wybierz plik z danymi", "DataFrame z PyCaret", "Wczytaj własne dane"]
-        .index(st.session_state["source"]),
+        index=2 if st.session_state.get("source") == "Wczytaj własne dane" else
+            0 if st.session_state.get("source") is None else
+            ["Wybierz plik z danymi", "DataFrame z PyCaret", "Wczytaj własne dane"]
+            .index(st.session_state["source"]),
     )
 
     # Reset po zmianie źródła
@@ -88,6 +90,7 @@ with tab_0:
         st.session_state["best_model"] = None
         st.session_state["selected_file"] = None
         st.session_state["target_column"] = None
+        st.session_state["df_clean"] = None
         st.rerun()
 
     df = None
@@ -161,6 +164,7 @@ with tab_0:
         st.session_state["best_model"] = None
         st.session_state["selected_file"] = new_selection
         st.session_state["target_column"] = None
+        st.session_state["df_clean"] = None
         st.rerun()
 
     # Zapis df do session_state
@@ -224,29 +228,61 @@ with tab_0:
                 st.warning("⚠️ Wybierz kolumnę docelową.")
                 st.stop()
 
-            # Walidacja braków
+            # Walidacja i czyszczenie braków w kolumnie docelowej
             missing = df[target].isna().sum()
             if missing > 0:
-                st.error(f"❌ Kolumna docelowa zawiera {missing} braków.")
-                st.stop()
+                st.info(f"""
+                        ℹ️ Kolumna docelowa zawiera **{missing}** brakujących wartości ({round(missing/len(df)*100, 2)}% danych).
+                        
+                        Wiersze z brakami zostaną automatycznie usunięte przed treningiem modelu.
+                        """)
+                
+                # Usuń wiersze z brakami w kolumnie docelowej
+                df_clean = df.dropna(subset=[target]).copy()
+                
+                st.write(f"📊 Dane po usunięciu braków: **{df_clean.shape[0]}** wierszy (było: **{df.shape[0]}**)")
+                
+                # Sprawdź czy zostało wystarczająco danych
+                if len(df_clean) < 10:
+                    st.error("❌ Po usunięciu braków zostało zbyt mało danych do treningu (mniej niż 10 wierszy).")
+                    st.stop()
+            else:
+                df_clean = df.copy()
 
             # Minimalne próbki w klasyfikacji
             if problem == "classification":
-                class_counts = df[target].value_counts()
+                class_counts = df_clean[target].value_counts()
                 if (class_counts < 2).any():
-                    st.error("❌ Niektóre klasy mają mniej niż 2 próbki.")
+                    st.warning("⚠️ Niektóre klasy mają mniej niż 2 próbki po usunięciu braków.")
                     st.stop()
 
             with st.spinner("🚀 Trening modeli..."):
                 if problem == "classification":
-                    clf_setup(df, target=target, session_id=42, fold=3)
+                    clf_setup(df_clean, target=target, session_id=42, fold=3)
                     best_model = clf_compare(
-                        include=["rf", "lightgbm", "lr"]
+                        include=[
+                            "rf",           # Random Forest - feature_importances_
+                            "lightgbm",     # Light GBM - feature_importances_
+                            "et",           # Extra Trees - feature_importances_
+                            "gbc",          # Gradient Boosting - feature_importances_
+                            "dt",           # Decision Tree - feature_importances_
+                            "lr",           # Logistic Regression - coef_
+                            "ridge",        # Ridge Classifier - coef_
+                        ]
                     )
                 else:
-                    reg_setup(df, target=target, session_id=42, fold=3 )
+                    reg_setup(df_clean, target=target, session_id=42, fold=3)
                     best_model = reg_compare(
-                        include=["rf", "lightgbm", "lr"]
+                        include=[
+                            "rf",           # Random Forest - feature_importances_
+                            "lightgbm",     # Light GBM - feature_importances_
+                            "et",           # Extra Trees - feature_importances_
+                            "gbr",          # Gradient Boosting - feature_importances_
+                            "dt",           # Decision Tree - feature_importances_
+                            "lr",           # Linear Regression - coef_
+                            "ridge",        # Ridge Regression - coef_
+                            "lasso",        # Lasso Regression - coef_
+                        ]
                     )
 
                 if isinstance(best_model, list):
@@ -256,6 +292,7 @@ with tab_0:
                     best_model = best_model[0]
 
             st.session_state["best_model"] = best_model
+            st.session_state["df_clean"] = df_clean
 
 
         # =====================================================
@@ -270,12 +307,15 @@ with tab_0:
             for f in glob.glob(f"{PLOT_DIR}/*.png"):
                 os.remove(f)
 
+            # Użyj oczyszczonych danych do wykresu
+            df_for_plot = st.session_state.get("df_clean", df)
+            
             try:
                 if problem == "classification":
-                    clf_setup(df, target=target, session_id=42, fold=3)
+                    clf_setup(df_for_plot, target=target, session_id=42, fold=3)
                     clf_plot_model(st.session_state["best_model"], plot="feature", save=str(PLOT_DIR))
                 else:
-                    reg_setup(df, target=target, session_id=42, fold=3)
+                    reg_setup(df_for_plot, target=target, session_id=42, fold=3)
                     reg_plot_model(st.session_state["best_model"], plot="feature", save=str(PLOT_DIR))
             except Exception as e:
                 st.error(f"❌ Nie udało się wygenerować wykresu: {e}")
@@ -300,12 +340,12 @@ with tab_0:
 
                 st.markdown("""
                 Wykres przedstawia które zmienne (kolumny w danych) mają największy wpływ na przewidywania modelu.  
-                Model podczas nauki „ocenia”, które cechy pomagają mu najskuteczniej przewidzieć wynik i te cechy zostają pokazane najwyżej na wykresie.
+                Model podczas nauki „ocenia", które cechy pomagają mu najskuteczniej przewidzieć wynik i te cechy zostają pokazane najwyżej na wykresie.
 
                 **Im wyżej znajduje się cecha, tym większy ma wpływ na wynik.**  
                 **Im niższa cecha, tym mniejszy jej wpływ.**
 
-                Oś pozioma pokazuje wartość „ważności”, czyli jak mocno dana cecha poprawia jakość przewidywań modelu.
+                Oś pozioma pokazuje wartość „ważności", czyli jak mocno dana cecha poprawia jakość przewidywań modelu.
 
                 Wykres **nie pokazuje kierunku wpływu** (czy coś zwiększa lub zmniejsza wynik),  
                 tylko **jak bardzo model potrzebuje danej zmiennej**, aby dobrze przewidywać.
@@ -337,13 +377,13 @@ with tab_0:
                     except Exception:
                         return None, None
 
-                feature_cols = df.drop(columns=[target])
+                feature_cols = df_for_plot.drop(columns=[target])
                 top_feature, top_value = get_top_feature(st.session_state["best_model"], feature_cols)
 
                 if top_feature is not None:
                     st.info(
                         f"Najważniejsza cecha: **{top_feature}**\n\n"
-                        f"Wartość ważności: **{round(float(top_value), 4)}**"
+                        f"Waga: **{round(float(top_value), 4)}**"
                     )
                 else:
                     st.warning("Nie udało się określić najważniejszej cechy.")

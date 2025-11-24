@@ -1,135 +1,115 @@
 # LYRA – Learning Your Relevant Attributes
 
-Aplikacja do automatycznej detekcji typu problemu (klasyfikacja lub regresja), budowania modeli i identyfikacji najważniejszych cech wpływających na wynik.
+Aplikacja do automatycznej detekcji typu problemu ML (klasyfikacja/regresja), budowania modeli i identyfikacji najważniejszych cech wpływających na wynik.
 
-## 1. Cel aplikacji
+## 🎯 Cel aplikacji
 
-LYRA pozwala wczytać dane, określić kolumnę docelową oraz automatycznie zbudować najlepszy model predykcyjny, jednocześnie wskazując, które zmienne mają największy wpływ na wynik. Aplikacja opiera się na PyCaret i Streamlit.
+LYRA umożliwia:
+- ⚡ Automatyczne wykrywanie typu problemu (klasyfikacja vs regresja)
+- 🤖 Budowanie najlepszego modelu predykcyjnego
+- 📊 Identyfikację najważniejszych cech wpływających na wynik
+- 📈 Wizualizację Feature Importance
 
-## 2. Początkowa specyfikacja projektu
+## 🚀 Demo
 
-Pierwotne wymagania projektu:
+**[Otwórz aplikację na Streamlit Cloud](https://lyraapp.streamlit.app/)**
 
-- Użytkownik może załadować plik CSV z danymi [DONE]
-- Użytkownik wskazuje kolumnę docelową [DONE]
-- Rozpoznajemy czy mamy do czynienia z problemem klasyfikacji czy regresji [DONE]
-- Generujemy najlepszy model dla danego problemu [DONE]
-- Wyświetlamy najważniejsze cechy [DONE]
-- Przesyłamy użytkownikowi opis słowny tego co znaleźliśmy [DONE]
+## ✨ Funkcjonalności
 
-## 3. Zakres funkcjonalny LYRA
+### 📂 Wieloźródłowe wczytywanie danych
+- Pliki lokalne z folderu `data/`
+- Predefiniowane zbiory PyCaret (blood, heart, questions, spx, automobile, energy)
+- Upload własnych plików (CSV, XLSX, XLS, JSON)
 
-### 3.1. Obsługa wielu źródeł danych
+### 🧠 Inteligentna detekcja problemu
+Automatyczne rozpoznawanie typu problemu na podstawie:
+- Typu danych kolumny docelowej
+- Liczby unikalnych wartości
+- Logiki: dane nienumeryczne → klasyfikacja; numeryczne z ≤20 wartościami → klasyfikacja; pozostałe → regresja
 
-Aplikacja umożliwia wczytanie danych z:
+### 🔧 Walidacja i czyszczenie danych
+- Automatyczne usuwanie wierszy z brakami w kolumnie docelowej
+- Wykrywanie klas z niewystarczającą liczbą próbek
+- Szczegółowe komunikaty o statusie danych
 
-- plików lokalnych (`data/`),
-- predefiniowanych zbiorów PyCaret,
-- własnych uploadów użytkownika (CSV, XLSX, XLS, JSON).
+### 🏆 Porównanie modeli ML
+Aplikacja testuje i wybiera najlepszy model z dostępnych algorytmów:
 
-### 3.2. Plik testowy (posiada pusty wiersz)
+**Klasyfikacja:** Random Forest, LightGBM, Logistic Regression, Extra Trees, Gradient Boosting, Decision Tree, Ridge
 
-Plik `titanic.csv` dodny żeby przetestować dodatkowe komunikaty.
+**Regresja:** Random Forest, LightGBM, Linear Regression, Extra Trees, Gradient Boosting, Decision Tree, Ridge, Lasso
 
-### 3.3. Obsługa stanu (`session_state`)
+> **Uwaga:** Modele zostały dobrane pod kątem gwarantowanej obsługi Feature Importance (`feature_importances_` lub `coef_`)
 
-Przechowywane są: dane, źródło, plik, target (kolumna docelowa), model, typ problemu.
+### 📊 Wizualizacja i analiza
+- Wykres Feature Importance (automatycznie generowany)
+- Identyfikacja najważniejszej cechy z wartością wagi
+- Szczegółowy opis interpretacji wykresu
 
-### 3.4. Automatyczny reset interfejsu
+## 🛠️ Technologie
 
-Zmiana źródła danych automatycznie czyści poprzednie wyniki, modele i wykresy.
+- **Streamlit** – interfejs webowy
+- **PyCaret** – AutoML i porównywanie modeli
+- **Pandas** – przetwarzanie danych
+- **Scikit-learn** – modele ML (w tle PyCaret)
+- **Pillow** – wyświetlanie wykresów
 
-### 3.5. Detekcja typu problemu
-
-Funkcja `detect_problem_type` klasyfikuje problem na podstawie:
-
-- typu danych,
-- liczby unikalnych wartości,
-- logiki: nienumeryczne → klasyfikacja; numeryczne z ≤ 20 wartościami → klasyfikacja; pozostałe → regresja.
-
-### 3.6. Walidacja jakości danych
-
-System wykrywa i obsługuje:
-
-- braki w kolumnie docelowej,
-- klasy z mniej niż 2 próbkami (klasyfikacja),
-- niepoprawne wybory użytkownika.
-
-### 3.7. Porównywanie wielu modeli
-
-Aplikacja wykorzystuje funkcję `compare_models()` z PyCaret, bazując na specjalnie wybranych listach modeli.
-
-Streamlit nie powala na dłuższe i bardziej skąplikowane obliczenia więc liczba modeli została ograniczona do 3.
-
-Domyślnie PyCaret trenuje każdy model 10 razy (10-fold cross validation)
-Zmiejszono cross validation do 3. `setup(..., fold=3)`
-
-#### Modele klasyfikacyjne:
-
-rf, lightgbm, lr
-
-#### Modele regresyjne:
-
-rf, lightgbm, lr
-
-#### Powód wyboru tych modeli:
-
-Lista modeli została ręcznie dobrana, ponieważ te konkretne algorytmy gwarantują możliwość wygenerowania wykresu Feature Importance w PyCaret.  
-Inne modele dostępne w bibliotece (np. kNN, Naive Bayes, niektóre warianty SVM, CatBoost, XGBoost bez konfiguracji, modele bez estymacji cech) generują błędy lub nie udostępniają:
-
-- `feature_importances_`
-- ani spójnego `coef_`,
-- ani obsługi wykresów typu `"feature"` w `plot_model()`.
-
-Z uwagi na stabilność aplikacji oraz powtarzalność wyników użyto więc tylko modeli, które na 100% pozwalają wygenerować wykres ważności cech bez błędów i wyjątków.
-
-#### Działanie:
-
-`compare_models()` wybiera najlepszy model na podstawie metryk odpowiednich dla klasyfikacji lub regresji, a następnie wykorzystywany jest on do generowania wykresu oraz wyliczenia najważniejszych cech.
-
-### 3.8. Generowanie wykresów Feature Importance
-
-- automatyczne czyszczenie katalogu `plots_feature/`,
-- generowanie wykresów PNG,
-- renderowanie w interfejsie Streamlit.
-
-### 3.9. Wyznaczanie najważniejszej cechy
-
-Uniwersalna logika obsługuje modele z `feature_importances_` oraz `coef_`.
-
-### 3.10. Layout interfejsu
-
-- dwie kolumny: wykres + opis,
-- wyrównanie pionowe CSS,
-- dwie zakładki (**Dane** / **Podgląd danych**).
-
-### 3.11. Precyzyjne komunikaty
-
-System wyświetla komunikaty:
-
-- błędów,
-- ostrzeżeń,
-- informacyjne,
-- potwierdzające wykonanie kroków.
-
-## 4. Uruchomienie
-
+### Requirements.txt
 ```
-https://lyraapp.streamlit.app/
+streamlit
+pandas
+pycaret
+pillow
+numpy
+openpyxl
 ```
 
-## 5. Przykładowy workflow użytkownika
+## 📖 Jak używać
 
-1. Wybór źródła danych.  
-2. Wczytanie i podgląd danych.  
-3. Wybór kolumny docelowej.  
-4. Automatyczna detekcja typu problemu.  
-5. Uruchomienie analizy cech.  
-6. Prezentacja modelu + wykresu + opisu + najważniejszej cechy.
+1. **Wybierz źródło danych** – lokalny plik, PyCaret dataset lub upload własny
+2. **Wczytaj dane** – aplikacja wyświetli podgląd i statystyki
+3. **Wybierz kolumnę docelową** – automatyczna detekcja typu problemu
+4. **Wykryj cechy** – kliknij przycisk "🔍 Wykryj najważniejsze cechy"
+5. **Analiza wyników** – zobacz wykres Feature Importance i najważniejszą cechę
 
-## 6. Plan rozwoju
+## 📁 Struktura projektu
 
-- SHAP values,
-- automatyczny wybór kolumny docelowej,
-- interaktywne wykresy Plotly,
-- eksport raportów PDF/HTML.
+```
+lyra/
+├── app.py                 # Główna aplikacja Streamlit
+├── data/                  # Folder na lokalne pliki danych
+│   └── iris.csv           # Przykładowy zbiór testowy
+│   └── titanic.csv        # Przykładowy zbiór testowy
+├── plots_feature/         # Automatycznie generowane wykresy
+├── requirements.txt       # Zależności Python
+└── README.md              # Dokumentacja
+```
+
+## ⚙️ Konfiguracja
+
+### Optymalizacja wydajności
+- Cross-validation zredukowane do 3 foldów (domyślnie 10) dla szybszych obliczeń
+- Lista modeli ograniczona do najstabilniejszych algorytmów
+
+### Minimalne wymagania danych
+- Minimum 10 wierszy po usunięciu braków w kolumnie docelowej
+- Dla klasyfikacji: każda klasa musi mieć ≥2 próbki
+
+## 🐛 Znane ograniczenia
+
+- Modele bez `feature_importances_` lub `coef_` nie są obsługiwane (np. KNN, Naive Bayes, niektóre SVM)
+- Długie obliczenia na dużych zbiorach danych (>10k wierszy) mogą przekraczać limity Streamlit Cloud
+- Brak obsługi danych tekstowych (NLP) – wymagane jest preprocessowanie
+
+## 🔮 Roadmap
+
+- SHAP values dla głębszej interpretacji modeli
+- Automatyczny wybór kolumny docelowej
+- Interaktywne wykresy Plotly
+- Eksport raportów do PDF/HTML
+- Obsługa większej liczby modeli (po optymalizacji)
+- Preprocessowanie danych (imputacja, encoding)
+
+---
+
+**Jeśli projekt Ci się podoba, zostaw ⭐ na GitHubie!**
