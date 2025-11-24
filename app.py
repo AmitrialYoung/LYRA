@@ -265,7 +265,6 @@ with tab_0:
                             "lightgbm",     # Light GBM - feature_importances_
                             "dt",           # Decision Tree - feature_importances_
                             "lr",           # Logistic Regression - coef_
-                            "ridge",        # Ridge Classifier - coef_
                         ]
                     )
                 else:
@@ -274,7 +273,6 @@ with tab_0:
                         include=[
                             "rf",           # Random Forest - feature_importances_
                             "lightgbm",     # Light GBM - feature_importances_
-                            "dt",           # Decision Tree - feature_importances_
                             "lr",           # Linear Regression - coef_
                             "ridge",        # Ridge Regression - coef_
                         ]

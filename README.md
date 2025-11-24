@@ -56,12 +56,14 @@ Aplikacja testuje i wybiera najlepszy model z dostępnych algorytmów:
 
 ### Requirements.txt
 ```
-streamlit
-pandas
-pycaret
-pillow
-numpy
-openpyxl
+matplotlib
+seaborn
+plotly
+pyarrow
+python-dotenv
+pycaret[full]
+frictionless
+pyyaml
 ```
 
 ## 📖 Jak używać
@@ -78,8 +80,8 @@ openpyxl
 lyra/
 ├── app.py                 # Główna aplikacja Streamlit
 ├── data/                  # Folder na lokalne pliki danych
-│   └── iris.csv           # Przykładowy zbiór testowy
 │   └── titanic.csv        # Przykładowy zbiór testowy
+│   └── iris.csv           # Przykładowy zbiór testowy
 ├── plots_feature/         # Automatycznie generowane wykresy
 ├── requirements.txt       # Zależności Python
 └── README.md              # Dokumentacja
