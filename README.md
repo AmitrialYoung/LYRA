@@ -35,11 +35,11 @@ Automatyczne rozpoznawanie typu problemu na podstawie:
 ### 🏆 Porównanie modeli ML
 Aplikacja testuje i wybiera najlepszy model z dostępnych algorytmów:
 
-**Klasyfikacja:** Random Forest, LightGBM, Logistic Regression, Extra Trees, Gradient Boosting, Decision Tree, Ridge
+**Klasyfikacja:** LightGBM, Random Forest, Logistic Regression, Decision Tree
 
-**Regresja:** Random Forest, LightGBM, Linear Regression, Extra Trees, Gradient Boosting, Decision Tree, Ridge, Lasso
+**Regresja:** LightGBM, Random Forest, Linear Regression, Ridge
 
-> **Uwaga:** Modele zostały dobrane pod kątem gwarantowanej obsługi Feature Importance (`feature_importances_` lub `coef_`)
+> **Uwaga:** Modele zostały dobrane pod kątem gwarantowanej obsługi Feature Importance (`feature_importances_` lub `coef_`) oraz optymalnej szybkości obliczeń.
 
 ### 📊 Wizualizacja i analiza
 - Wykres Feature Importance (automatycznie generowany)

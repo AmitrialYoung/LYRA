@@ -232,7 +232,7 @@ with tab_0:
             missing = df[target].isna().sum()
             if missing > 0:
                 st.info(f"""
-                        ℹ️ Kolumna docelowa zawiera **{missing}** brakujących wartości ({round(missing/len(df)*100, 2)}% danych).
+                        ℹ️ Kolumna docelowa zawiera brakujące wartości: {missing} ({round(missing/len(df)*100, 2)}% danych).
                         
                         Wiersze z brakami zostaną automatycznie usunięte przed treningiem modelu.
                         """)
@@ -240,7 +240,7 @@ with tab_0:
                 # Usuń wiersze z brakami w kolumnie docelowej
                 df_clean = df.dropna(subset=[target]).copy()
                 
-                st.write(f"📊 Dane po usunięciu braków: **{df_clean.shape[0]}** wierszy (było: **{df.shape[0]}**)")
+                st.write(f"📊 Dane po usunięciu braków: **{df_clean.shape[0]}** *(wierszy było: **{df.shape[0]}**)*")
                 
                 # Sprawdź czy zostało wystarczająco danych
                 if len(df_clean) < 10:
@@ -253,7 +253,7 @@ with tab_0:
             if problem == "classification":
                 class_counts = df_clean[target].value_counts()
                 if (class_counts < 2).any():
-                    st.warning("⚠️ Niektóre klasy mają mniej niż 2 próbki po usunięciu braków.")
+                    st.warning("⚠️ Niektóre klasy mają mniej niż 2 próbki. Wybierz inną kolumnę docelową.")
                     st.stop()
 
             with st.spinner("🚀 Trening modeli..."):
@@ -263,8 +263,6 @@ with tab_0:
                         include=[
                             "rf",           # Random Forest - feature_importances_
                             "lightgbm",     # Light GBM - feature_importances_
-                            "et",           # Extra Trees - feature_importances_
-                            "gbc",          # Gradient Boosting - feature_importances_
                             "dt",           # Decision Tree - feature_importances_
                             "lr",           # Logistic Regression - coef_
                             "ridge",        # Ridge Classifier - coef_
@@ -276,12 +274,9 @@ with tab_0:
                         include=[
                             "rf",           # Random Forest - feature_importances_
                             "lightgbm",     # Light GBM - feature_importances_
-                            "et",           # Extra Trees - feature_importances_
-                            "gbr",          # Gradient Boosting - feature_importances_
                             "dt",           # Decision Tree - feature_importances_
                             "lr",           # Linear Regression - coef_
                             "ridge",        # Ridge Regression - coef_
-                            "lasso",        # Lasso Regression - coef_
                         ]
                     )
 
