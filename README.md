@@ -51,19 +51,16 @@ Aplikacja testuje i wybiera najlepszy model z dostępnych algorytmów:
 - **Streamlit** – interfejs webowy
 - **PyCaret** – AutoML i porównywanie modeli
 - **Pandas** – przetwarzanie danych
-- **Scikit-learn** – modele ML (w tle PyCaret)
 - **Pillow** – wyświetlanie wykresów
 
 ### Requirements.txt
 ```
-matplotlib
-seaborn
-plotly
-pyarrow
-python-dotenv
-pycaret[full]
-frictionless
-pyyaml
+streamlit
+pandas
+pycaret
+pillow
+numpy
+openpyxl
 ```
 
 ## 📖 Jak używać
@@ -90,7 +87,7 @@ lyra/
 ## ⚙️ Konfiguracja
 
 ### Optymalizacja wydajności
-- Cross-validation zredukowane do 3 foldów (domyślnie 10) dla szybszych obliczeń
+- Cross-validation zredukowane do 2 foldów (domyślnie 10) dla szybszych obliczeń
 - Lista modeli ograniczona do najstabilniejszych algorytmów
 
 ### Minimalne wymagania danych

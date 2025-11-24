@@ -258,7 +258,7 @@ with tab_0:
 
             with st.spinner("🚀 Trening modeli..."):
                 if problem == "classification":
-                    clf_setup(df_clean, target=target, session_id=42, fold=3)
+                    clf_setup(df_clean, target=target, session_id=42, fold=2)
                     best_model = clf_compare(
                         include=[
                             "rf",           # Random Forest - feature_importances_
@@ -267,7 +267,7 @@ with tab_0:
                         ]
                     )
                 else:
-                    reg_setup(df_clean, target=target, session_id=42, fold=3)
+                    reg_setup(df_clean, target=target, session_id=42, fold=2)
                     best_model = reg_compare(
                         include=[
                             "rf",           # Random Forest - feature_importances_
@@ -303,10 +303,10 @@ with tab_0:
             
             try:
                 if problem == "classification":
-                    clf_setup(df_for_plot, target=target, session_id=42, fold=3)
+                    clf_setup(df_for_plot, target=target, session_id=42, fold=2)
                     clf_plot_model(st.session_state["best_model"], plot="feature", save=str(PLOT_DIR))
                 else:
-                    reg_setup(df_for_plot, target=target, session_id=42, fold=3)
+                    reg_setup(df_for_plot, target=target, session_id=42, fold=2)
                     reg_plot_model(st.session_state["best_model"], plot="feature", save=str(PLOT_DIR))
             except Exception as e:
                 st.error(f"❌ Nie udało się wygenerować wykresu: {e}")
