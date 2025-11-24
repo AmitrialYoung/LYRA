@@ -97,7 +97,7 @@ lyra/
 ## 🐛 Znane ograniczenia
 
 - Modele bez `feature_importances_` lub `coef_` nie są obsługiwane (np. KNN, Naive Bayes, niektóre SVM)
-- Długie obliczenia na dużych zbiorach danych (>10k wierszy) mogą przekraczać limity Streamlit Cloud
+- Długie obliczenia na dużych zbiorach danych (>1000 wierszy) mogą przekraczać limity Streamlit Cloud
 - Brak obsługi danych tekstowych (NLP) – wymagane jest preprocessowanie
 
 ## 🔮 Roadmap
